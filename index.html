@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Git 命令速查</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f6f4ef;
+        --surface: #fffdf9;
+        --surface-2: #efeadf;
+        --ink: #1d1a16;
+        --ink-2: #5c554b;
+        --ink-3: #8a8175;
+        --line: #ddd5c6;
+        --accent: #e8491f;
+        --accent-ink: #c93a14;
+        --accent-soft: #fdeee8;
+        --code-bg: #211d19;
+        --code-ink: #f3ead9;
+        --code-dim: #a89a83;
+        --warn-bg: #fdf3d7;
+        --warn-ink: #8a6410;
+        --warn-line: #e8cf8a;
+        --ok: #2e7d46;
+        --shadow: 0 1px 2px rgba(29, 26, 22, .06), 0 8px 24px -12px rgba(29, 26, 22, .18);
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #14120f;
+          --surface: #1e1b17;
+          --surface-2: #26221d;
+          --ink: #f0e9dc;
+          --ink-2: #b3a893;
+          --ink-3: #7e7462;
+          --line: #37312a;
+          --accent: #ff6a3d;
+          --accent-ink: #ff8a63;
+          --accent-soft: #3a2119;
+          --code-bg: #0d0b09;
+          --code-ink: #f3ead9;
+          --code-dim: #8d8069;
+          --warn-bg: #33290f;
+          --warn-ink: #eec96a;
+          --warn-line: #5c4a1c;
+          --ok: #6fce8f;
+          --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      button, input { font: inherit; }
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2rem; }
+
+      .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px 72px; }
+
+      /* ---------- 头部 ---------- */
+      header.hero { padding: 36px 0 8px; }
+      .hero-row { display: flex; align-items: flex-start; gap: 14px; }
+      .git-mark {
+        flex: none; width: 52px; height: 52px; border-radius: 12px;
+        background: var(--accent); color: #fff;
+        display: grid; place-items: center;
+        font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 15px;
+        letter-spacing: -.5px; transform: rotate(-4deg);
+        box-shadow: var(--shadow);
+      }
+      h1 { margin: 0; font-size: 30px; font-weight: 900; letter-spacing: .5px; line-height: 1.25; }
+      .hero-sub { margin: 6px 0 0; color: var(--ink-2); font-size: 14px; max-width: 34em; }
+      .hero-sub b { color: var(--accent-ink); font-weight: 700; }
+
+      /* ---------- 搜索 ---------- */
+      .searchbar {
+        position: sticky; top: 0; z-index: 20;
+        padding: 14px 0 10px;
+        background: linear-gradient(var(--bg) 78%, transparent);
+      }
+      .searchbox {
+        display: flex; align-items: center; gap: 10px;
+        background: var(--surface); border: 1.5px solid var(--line);
+        border-radius: var(--radius); padding: 4px 6px 4px 14px;
+        box-shadow: var(--shadow);
+        transition: border-color .15s;
+      }
+      .searchbox:focus-within { border-color: var(--accent); }
+      .searchbox svg { flex: none; color: var(--ink-3); }
+      .searchbox input {
+        flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+        color: var(--ink); font-size: 16px; min-height: 40px;
+      }
+      .searchbox input::placeholder { color: var(--ink-3); }
+      .clear-btn {
+        flex: none; border: 0; cursor: pointer; display: none;
+        background: var(--surface-2); color: var(--ink-2);
+        border-radius: 9px; padding: 6px 12px; font-size: 13px; min-height: 36px;
+      }
+      .clear-btn:hover { color: var(--ink); }
+      .searchbox.has-text .clear-btn { display: block; }
+      .result-line { margin: 8px 2px 0; font-size: 13px; color: var(--ink-3); min-height: 1.4em; }
+      .result-line b { color: var(--accent-ink); }
+
+      /* ---------- 分类导航 ---------- */
+      nav.cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 6px; }
+      .cat-chip {
+        border: 1.5px solid var(--line); background: var(--surface); color: var(--ink-2);
+        border-radius: 999px; padding: 7px 14px; cursor: pointer; font-size: 13.5px;
+        min-height: 38px; transition: all .15s;
+      }
+      .cat-chip:hover { border-color: var(--accent); color: var(--accent-ink); }
+      .cat-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+      .cat-chip .n { opacity: .65; font-size: 12px; margin-left: 3px; font-family: "JetBrains Mono", monospace; }
+
+      /* ---------- 分区 ---------- */
+      section.cat { margin-top: 34px; scroll-margin-top: 130px; }
+      .cat-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+      .cat-head h2 { margin: 0; font-size: 20px; font-weight: 900; }
+      .cat-head .en {
+        font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-3);
+        text-transform: uppercase; letter-spacing: 1px;
+      }
+      .cat-head .count { margin-left: auto; font-size: 12.5px; color: var(--ink-3); font-family: "JetBrains Mono", monospace; }
+      .cat-desc { margin: 0 0 14px; color: var(--ink-2); font-size: 13.5px; }
+
+      .cmd-list { display: flex; flex-direction: column; gap: 10px; }
+      .cmd {
+        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 12px 12px 12px 16px; box-shadow: var(--shadow);
+        display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: start;
+      }
+      .cmd .desc { font-size: 14.5px; font-weight: 500; padding-top: 2px; }
+      .cmd .desc .note { display: block; font-weight: 400; font-size: 12.5px; color: var(--ink-3); margin-top: 1px; }
+      .badge-warn {
+        display: inline-block; vertical-align: 2px; margin-left: 6px;
+        background: var(--warn-bg); color: var(--warn-ink); border: 1px solid var(--warn-line);
+        font-size: 11px; font-weight: 700; border-radius: 6px; padding: 0 6px; line-height: 1.7;
+      }
+      .code-row { grid-column: 1 / -1; display: flex; align-items: stretch; gap: 8px; }
+      .code {
+        flex: 1; min-width: 0; background: var(--code-bg); color: var(--code-ink);
+        border-radius: 10px; padding: 9px 12px;
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13.5px; line-height: 1.55; overflow-x: auto; white-space: nowrap;
+        scrollbar-width: thin;
+      }
+      .code .ph { color: var(--code-dim); }
+      .copy-btn {
+        flex: none; border: 1.5px solid var(--line); background: var(--surface);
+        color: var(--ink-2); border-radius: 10px; cursor: pointer;
+        padding: 0 14px; font-size: 13px; min-height: 40px;
+        display: inline-flex; align-items: center; gap: 6px;
+        transition: all .15s;
+      }
+      .copy-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+      .copy-btn:active { transform: scale(.96); }
+      .copy-btn.done { border-color: var(--ok); color: var(--ok); }
+
+      mark { background: var(--accent-soft); color: var(--accent-ink); border-radius: 3px; padding: 0 1px; }
+
+      .empty {
+        display: none; text-align: center; padding: 56px 20px;
+        border: 1.5px dashed var(--line); border-radius: var(--radius); margin-top: 28px;
+      }
+      .empty.show { display: block; }
+      .empty .big { font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--ink-3); }
+      .empty p { color: var(--ink-2); margin: 8px 0 0; font-size: 14px; }
+
+      footer { margin-top: 56px; border-top: 1px solid var(--line); padding-top: 18px; color: var(--ink-3); font-size: 13px; }
+      footer code { font-family: "JetBrains Mono", monospace; font-size: 12.5px; background: var(--surface-2); border-radius: 5px; padding: 1px 6px; }
+
+      /* ---------- Toast ---------- */
+      .toast {
+        position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 16px);
+        background: var(--ink); color: var(--bg); border-radius: 999px;
+        padding: 10px 20px; font-size: 14px; font-weight: 500;
+        opacity: 0; pointer-events: none; transition: all .22s ease; z-index: 50;
+        box-shadow: 0 10px 30px rgba(0,0,0,.25); max-width: calc(100vw - 32px);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+      @media (max-width: 560px) {
+        header.hero { padding-top: 24px; }
+        h1 { font-size: 25px; }
+        .git-mark { width: 44px; height: 44px; font-size: 13px; }
+        .cmd { padding: 10px 10px 10px 13px; }
+        .code { font-size: 12.5px; white-space: normal; overflow-wrap: anywhere; }
+        .copy-btn { padding: 0 11px; }
+        section.cat { scroll-margin-top: 118px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        .toast, .copy-btn { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <div class="hero-row">
+          <div class="git-mark" aria-hidden="true">git</div>
+          <div>
+            <h1>Git 命令速查</h1>
+            <p class="hero-sub">开发者高频 Git 命令按场景分类整理，共 <b id="totalCount">—</b> 条。输入关键词即时筛选，点「复制」直接粘贴到终端使用；命令里的 <b>&lt;尖括号&gt;</b> 是需要替换成你自己内容的部分。</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="searchbar">
+        <div class="searchbox" id="searchbox">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+          <input id="search" type="search" placeholder="搜索命令或用途，如：撤销、远程、branch、回退…" autocomplete="off" aria-label="搜索 Git 命令" />
+          <button class="clear-btn" id="clearBtn" type="button">清除</button>
+        </div>
+        <p class="result-line" id="resultLine" aria-live="polite"></p>
+      </div>
+
+      <nav class="cats" id="catNav" aria-label="命令分类"></nav>
+
+      <main id="sections"></main>
+
+      <div class="empty" id="emptyState">
+        <div class="big">$ git ???</div>
+        <p>没有匹配的命令，换个关键词试试，比如「提交」「分支」「远程」。</p>
+      </div>
+
+      <footer>
+        <p>占位符说明：<code>&lt;分支名&gt;</code>、<code>&lt;文件&gt;</code> 等尖括号内容需替换为实际值后再执行。标有「慎用」的命令会丢弃未提交的修改或改写历史，执行前先用 <code>git status</code> 确认当前状态。</p>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+      var CATS = [
+        {
+          id: "setup", name: "初始配置", en: "Setup",
+          desc: "第一次使用 Git 时的身份与常用设置，配好一次即可。",
+          cmds: [
+            { c: 'git config --global user.name "你的名字"', d: "设置全局用户名", kw: "config name 配置 名字" },
+            { c: 'git config --global user.email "you@example.com"', d: "设置全局邮箱", kw: "config email 配置 邮箱" },
+            { c: "git config --global init.defaultBranch main", d: "设置新仓库的默认分支名为 main", kw: "config default branch 默认分支" },
+            { c: "git config --global core.editor \"code --wait\"", d: "设置默认编辑器为 VS Code", kw: "config editor 编辑器" },
+            { c: "git config --list", d: "查看全部配置", kw: "config list 查看配置" },
+            { c: "git --version", d: "查看 Git 版本", kw: "version 版本" },
+            { c: "git help <命令>", d: "查看某条命令的帮助文档", n: "如 git help commit", kw: "help 帮助 文档" }
+          ]
+        },
+        {
+          id: "repo", name: "仓库操作", en: "Repository",
+          desc: "创建、克隆仓库，以及查看工作区状态和添加文件。",
+          cmds: [
+            { c: "git init", d: "在当前目录初始化一个新仓库", kw: "init 初始化 新建" },
+            { c: "git init <目录名>", d: "在指定目录初始化新仓库", kw: "init 初始化 新建" },
+            { c: "git clone <仓库地址>", d: "克隆远程仓库到本地", kw: "clone 克隆 下载 远程" },
+            { c: "git clone <仓库地址> <目录名>", d: "克隆并指定本地目录名", kw: "clone 克隆" },
+            { c: "git clone --depth 1 <仓库地址>", d: "浅克隆，只拉取最近一次提交，速度快、体积小", kw: "clone shallow 浅克隆 depth" },
+            { c: "git status", d: "查看工作区与暂存区状态", kw: "status 状态 查看" },
+            { c: "git add <文件>", d: "把文件加入暂存区", kw: "add 暂存 添加" },
+            { c: "git add .", d: "把当前目录所有改动加入暂存区", kw: "add 暂存 全部" },
+            { c: "git add -p", d: "逐块挑选要暂存的改动", kw: "add patch 逐块 暂存" }
+          ]
+        },
+        {
+          id: "commit", name: "提交与暂存", en: "Commit",
+          desc: "把暂存区的改动正式记录为一次提交。",
+          cmds: [
+            { c: 'git commit -m "提交说明"', d: "提交暂存区内容并写说明", kw: "commit 提交 message" },
+            { c: 'git commit -am "提交说明"', d: "跳过 add，直接提交所有已跟踪文件的改动", kw: "commit 提交 全部" },
+            { c: "git commit --amend", d: "修改最近一次提交（说明或内容）", n: "已推送到远程的提交不要 amend", kw: "amend 修改 补提交" },
+            { c: 'git commit --amend --no-edit', d: "把新暂存的改动并入上一次提交，说明不变", kw: "amend 修改 补提交 no-edit" },
+            { c: "git diff", d: "查看工作区尚未暂存的改动", kw: "diff 差异 比较 改动" },
+            { c: "git diff --staged", d: "查看已暂存、待提交的改动", kw: "diff staged 暂存 差异" },
+            { c: "git diff <分支A> <分支B>", d: "比较两个分支之间的差异", kw: "diff 比较 分支 差异" },
+            { c: "git rm <文件>", d: "删除文件并把删除动作加入暂存区", kw: "rm 删除 文件" },
+            { c: "git rm --cached <文件>", d: "把文件移出版本管理，但保留本地文件", n: "常用于误提交后补写 .gitignore", kw: "rm cached 取消跟踪 gitignore" },
+            { c: "git mv <旧名> <新名>", d: "重命名或移动已跟踪文件", kw: "mv 重命名 移动" }
+          ]
+        },
+        {
+          id: "branch", name: "分支管理", en: "Branch",
+          desc: "创建、切换、合并与删除分支，日常开发的主战场。",
+          cmds: [
+            { c: "git branch", d: "列出本地分支（* 为当前分支）", kw: "branch 分支 列表" },
+            { c: "git branch -a", d: "列出本地与远程的全部分支", kw: "branch all 分支 远程" },
+            { c: "git branch <分支名>", d: "新建分支（不切换过去）", kw: "branch 新建 创建 分支" },
+            { c: "git switch <分支名>", d: "切换到已有分支", kw: "switch checkout 切换 分支" },
+            { c: "git switch -c <分支名>", d: "新建分支并立即切换过去", kw: "switch checkout 新建 切换 分支" },
+            { c: "git checkout <分支名>", d: "切换分支（老写法，与 switch 等价）", kw: "checkout 切换 分支" },
+            { c: "git branch -d <分支名>", d: "删除已合并的分支", kw: "branch delete 删除 分支" },
+            { c: "git branch -D <分支名>", d: "强制删除分支（未合并也会删）", warn: true, kw: "branch delete 删除 分支 强制" },
+            { c: "git branch -m <旧名> <新名>", d: "重命名分支", kw: "branch rename 重命名 分支" },
+            { c: "git merge <分支名>", d: "把指定分支合并到当前分支", kw: "merge 合并 分支" },
+            { c: "git merge --abort", d: "放弃正在进行、存在冲突的合并", kw: "merge abort 放弃 冲突 合并" },
+            { c: "git rebase <目标分支>", d: "把当前分支的提交变基到目标分支之上，历史更线性", n: "不要对已推送的公共分支 rebase", kw: "rebase 变基 合并" },
+            { c: "git rebase -i HEAD~3", d: "交互式整理最近 3 次提交（合并、改说明、排序）", kw: "rebase interactive 交互 整理提交 squash" },
+            { c: "git cherry-pick <提交ID>", d: "把某一次提交单独摘到当前分支", kw: "cherry-pick 摘取 单个提交" }
+          ]
+        },
+        {
+          id: "undo", name: "撤销与回退", en: "Undo",
+          desc: "改错了、提错了都不怕——先分清改动在工作区、暂存区还是已提交。",
+          cmds: [
+            { c: "git restore <文件>", d: "丢弃工作区中该文件的未暂存改动", warn: true, kw: "restore checkout 撤销 丢弃 工作区" },
+            { c: "git restore --staged <文件>", d: "把文件移出暂存区，改动本身保留", kw: "restore staged 取消暂存 reset" },
+            { c: "git reset --soft HEAD~1", d: "撤销最近一次提交，改动退回暂存区", kw: "reset soft 撤销提交 回退" },
+            { c: "git reset HEAD~1", d: "撤销最近一次提交，改动退回工作区（默认 mixed）", kw: "reset mixed 撤销提交 回退" },
+            { c: "git reset --hard HEAD~1", d: "撤销最近一次提交并丢弃全部改动", warn: true, kw: "reset hard 撤销提交 回退 丢弃" },
+            { c: "git reset --hard <提交ID>", d: "把当前分支强制回退到指定提交", warn: true, kw: "reset hard 回退 指定提交" },
+            { c: "git revert <提交ID>", d: "新建一次提交来抵消指定提交，历史不改写", n: "撤销已推送的提交优先用这个", kw: "revert 反做 撤销 抵消" },
+            { c: "git clean -n", d: "预览将要删除的未跟踪文件（不真删）", kw: "clean 清理 未跟踪 预览" },
+            { c: "git clean -fd", d: "删除所有未跟踪的文件和目录", warn: true, kw: "clean 清理 删除 未跟踪" },
+            { c: "git reflog", d: "查看 HEAD 的移动记录，误删误退后找回提交靠它", kw: "reflog 找回 恢复 记录" }
+          ]
+        },
+        {
+          id: "remote", name: "远程同步", en: "Remote",
+          desc: "与 GitHub、GitLab 等远程仓库之间拉取和推送代码。",
+          cmds: [
+            { c: "git remote -v", d: "查看已配置的远程仓库地址", kw: "remote 远程 查看 地址" },
+            { c: "git remote add origin <仓库地址>", d: "添加名为 origin 的远程仓库", kw: "remote add 添加 远程 origin" },
+            { c: "git remote set-url origin <新地址>", d: "修改远程仓库地址", kw: "remote set-url 修改 远程 地址" },
+            { c: "git fetch", d: "拉取远程最新状态到本地，但不合并", kw: "fetch 拉取 远程 更新" },
+            { c: "git pull", d: "拉取远程改动并合并到当前分支", kw: "pull 拉取 合并 同步" },
+            { c: "git pull --rebase", d: "拉取后以变基方式整合，历史更整洁", kw: "pull rebase 拉取 变基" },
+            { c: "git push", d: "把当前分支的提交推送到远程", kw: "push 推送 上传 同步" },
+            { c: "git push -u origin <分支名>", d: "首次推送分支并建立与远程的跟踪关系", kw: "push upstream 首次 推送 跟踪" },
+            { c: "git push origin --delete <分支名>", d: "删除远程分支", kw: "push delete 删除 远程分支" },
+            { c: "git push --force-with-lease", d: "强推改写后的历史，远程有新提交时会拒绝，比 --force 安全", warn: true, kw: "push force 强推 改写历史" }
+          ]
+        },
+        {
+          id: "history", name: "查看历史", en: "History",
+          desc: "翻提交记录、定位改动来源、看某个文件的前世今生。",
+          cmds: [
+            { c: "git log", d: "查看提交历史（q 退出）", kw: "log 历史 记录 提交" },
+            { c: "git log --oneline", d: "每次提交只显示一行，简洁版历史", kw: "log oneline 历史 简洁" },
+            { c: "git log --oneline --graph --all", d: "用图形方式查看全部分支的历史走向", kw: "log graph 图形 分支 历史" },
+            { c: "git log -5", d: "只看最近 5 次提交", kw: "log 最近 历史" },
+            { c: "git log -- <文件>", d: "查看某个文件的提交历史", kw: "log 文件 历史" },
+            { c: "git log -p -1", d: "查看最近一次提交的具体改动内容", kw: "log patch 改动 内容" },
+            { c: "git show <提交ID>", d: "查看某次提交的说明与完整改动", kw: "show 查看 提交 详情" },
+            { c: "git blame <文件>", d: "逐行查看每行代码最后由谁、在哪次提交修改", kw: "blame 逐行 作者 追溯" },
+            { c: "git shortlog -sn", d: "按作者统计提交次数", kw: "shortlog 统计 作者 排名" },
+            { c: "git log --since=\"2 weeks ago\"", d: "查看最近两周内的提交", kw: "log since 时间 范围 历史" }
+          ]
+        },
+        {
+          id: "tag", name: "标签管理", en: "Tag",
+          desc: "给重要提交打上版本号标记，常用于发布版本。",
+          cmds: [
+            { c: "git tag", d: "列出全部标签", kw: "tag 标签 列表 版本" },
+            { c: "git tag v1.0.0", d: "在当前提交打轻量标签", kw: "tag 标签 新建 版本" },
+            { c: 'git tag -a v1.0.0 -m "正式发布 1.0.0"', d: "打带说明的附注标签（发布版本推荐）", kw: "tag annotate 附注 标签 版本" },
+            { c: "git tag v0.9.0 <提交ID>", d: "给过去的某次提交补打标签", kw: "tag 标签 补打 提交" },
+            { c: "git show v1.0.0", d: "查看标签指向的提交详情", kw: "tag show 查看 标签" },
+            { c: "git push origin v1.0.0", d: "把单个标签推送到远程", kw: "tag push 推送 标签" },
+            { c: "git push origin --tags", d: "把全部本地标签推送到远程", kw: "tag push 推送 全部标签" },
+            { c: "git tag -d v1.0.0", d: "删除本地标签", kw: "tag delete 删除 标签" },
+            { c: "git push origin --delete v1.0.0", d: "删除远程标签", kw: "tag delete 删除 远程标签" },
+            { c: "git checkout v1.0.0", d: "切换到某个标签对应的代码状态", kw: "tag checkout 切换 标签 版本" }
+          ]
+        },
+        {
+          id: "stash", name: "储藏与杂项", en: "Stash & More",
+          desc: "临时收起改动去处理别的事，以及几个救急常用命令。",
+          cmds: [
+            { c: "git stash", d: "把当前未提交的改动临时收起来，工作区恢复干净", kw: "stash 储藏 临时 收起" },
+            { c: 'git stash push -m "备注"', d: "储藏改动并写备注，方便日后辨认", kw: "stash 储藏 备注" },
+            { c: "git stash list", d: "查看所有储藏记录", kw: "stash list 列表 储藏" },
+            { c: "git stash pop", d: "恢复最近一次储藏并从列表中删除它", kw: "stash pop 恢复 储藏" },
+            { c: "git stash apply", d: "恢复最近一次储藏，但保留在列表中", kw: "stash apply 恢复 储藏" },
+            { c: "git stash drop", d: "删除最近一次储藏", kw: "stash drop 删除 储藏" },
+            { c: "git stash clear", d: "清空全部储藏记录", warn: true, kw: "stash clear 清空 储藏" },
+            { c: "git bisect start", d: "二分查找定位引入 bug 的那次提交", n: "配合 bisect good / bad 逐步缩小范围", kw: "bisect 二分 定位 bug" },
+            { c: "git worktree add ../<目录> <分支名>", d: "为另一个分支新建独立工作目录，可同时开发两个分支", kw: "worktree 工作树 多目录" },
+            { c: "git gc", d: "清理无用对象、压缩仓库体积", kw: "gc 清理 压缩 仓库" }
+          ]
+        }
+      ];
+
+      var sectionsEl = document.getElementById("sections");
+      var navEl = document.getElementById("catNav");
+      var searchEl = document.getElementById("search");
+      var searchboxEl = document.getElementById("searchbox");
+      var resultLine = document.getElementById("resultLine");
+      var emptyEl = document.getElementById("emptyState");
+      var toastEl = document.getElementById("toast");
+      var toastTimer = null;
+      var activeCat = "all";
+
+      function escHtml(s) {
+        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+      function codeHtml(cmd) {
+        return escHtml(cmd).replace(/&lt;([^&]+?)&gt;/g, '<span class="ph">&lt;$1&gt;</span>');
+      }
+
+      var total = 0;
+      CATS.forEach(function (cat) { total += cat.cmds.length; });
+      document.getElementById("totalCount").textContent = total;
+
+      // 分类导航
+      var allChip = document.createElement("button");
+      allChip.className = "cat-chip active";
+      allChip.type = "button";
+      allChip.dataset.cat = "all";
+      allChip.innerHTML = "全部<span class='n'>" + total + "</span>";
+      navEl.appendChild(allChip);
+      CATS.forEach(function (cat) {
+        var b = document.createElement("button");
+        b.className = "cat-chip";
+        b.type = "button";
+        b.dataset.cat = cat.id;
+        b.innerHTML = escHtml(cat.name) + "<span class='n'>" + cat.cmds.length + "</span>";
+        navEl.appendChild(b);
+      });
+
+      // 渲染分区
+      CATS.forEach(function (cat) {
+        var sec = document.createElement("section");
+        sec.className = "cat";
+        sec.id = "cat-" + cat.id;
+        sec.dataset.cat = cat.id;
+        var html = '<div class="cat-head"><h2>' + escHtml(cat.name) + '</h2><span class="en">' +
+          escHtml(cat.en) + '</span><span class="count"></span></div>' +
+          '<p class="cat-desc">' + escHtml(cat.desc) + '</p><div class="cmd-list">';
+        cat.cmds.forEach(function (item, i) {
+          html += '<article class="cmd" data-idx="' + i + '">' +
+            '<div class="desc">' + escHtml(item.d) +
+            (item.warn ? '<span class="badge-warn">慎用</span>' : '') +
+            (item.n ? '<span class="note">' + escHtml(item.n) + '</span>' : '') +
+            '</div>' +
+            '<div class="code-row"><code class="code">' + codeHtml(item.c) + '</code>' +
+            '<button class="copy-btn" type="button" data-copy="' + escHtml(item.c).replace(/"/g, "&quot;") + '" aria-label="复制命令：' + escHtml(item.c).replace(/"/g, "&quot;") + '">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>复制</button></div>' +
+            '</article>';
+        });
+        html += "</div>";
+        sec.innerHTML = html;
+        sectionsEl.appendChild(sec);
+      });
+
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1800);
+      }
+
+      function copyText(text, btn) {
+        function done() {
+          showToast("已复制：" + text);
+          if (btn) {
+            var old = btn.innerHTML;
+            btn.classList.add("done");
+            btn.innerHTML = "✓ 已复制";
+            setTimeout(function () { btn.classList.remove("done"); btn.innerHTML = old; }, 1400);
+          }
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, function () { fallback(); });
+        } else { fallback(); }
+        function fallback() {
+          var ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand("copy"); done(); }
+          catch (e) { showToast("复制失败，请长按命令手动复制"); }
+          document.body.removeChild(ta);
+        }
+      }
+
+      sectionsEl.addEventListener("click", function (e) {
+        var btn = e.target.closest(".copy-btn");
+        if (btn) copyText(btn.dataset.copy, btn);
+      });
+
+      // 搜索 + 分类过滤
+      function applyFilter() {
+        var q = searchEl.value.trim().toLowerCase();
+        searchboxEl.classList.toggle("has-text", q.length > 0);
+        var shown = 0;
+        CATS.forEach(function (cat) {
+          var sec = document.getElementById("cat-" + cat.id);
+          var catVisible = (activeCat === "all" || activeCat === cat.id);
+          var secShown = 0;
+          var articles = sec.querySelectorAll(".cmd");
+          cat.cmds.forEach(function (item, i) {
+            var hay = (item.c + " " + item.d + " " + (item.n || "") + " " + (item.kw || "") + " " + cat.name).toLowerCase();
+            var match = !q || hay.indexOf(q) !== -1;
+            var vis = catVisible && match;
+            articles[i].style.display = vis ? "" : "none";
+            if (vis) { secShown++; shown++; }
+          });
+          sec.style.display = secShown > 0 ? "" : "none";
+          sec.querySelector(".count").textContent = (activeCat === "all" && !q)
+            ? cat.cmds.length + " 条"
+            : secShown + " / " + cat.cmds.length + " 条";
+        });
+        emptyEl.classList.toggle("show", shown === 0);
+        if (q) {
+          resultLine.innerHTML = "找到 <b>" + shown + "</b> 条与「" + escHtml(searchEl.value.trim()) + "」相关的命令";
+        } else if (activeCat !== "all") {
+          resultLine.innerHTML = "当前分类共 <b>" + shown + "</b> 条命令";
+        } else {
+          resultLine.textContent = "";
+        }
+      }
+
+      var searchTimer = null;
+      searchEl.addEventListener("input", function () {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(applyFilter, 60);
+      });
+      document.getElementById("clearBtn").addEventListener("click", function () {
+        searchEl.value = "";
+        applyFilter();
+        searchEl.focus();
+      });
+
+      navEl.addEventListener("click", function (e) {
+        var chip = e.target.closest(".cat-chip");
+        if (!chip) return;
+        activeCat = chip.dataset.cat;
+        navEl.querySelectorAll(".cat-chip").forEach(function (c) {
+          c.classList.toggle("active", c === chip);
+        });
+        applyFilter();
+        if (activeCat !== "all") {
+          var sec = document.getElementById("cat-" + activeCat);
+          if (sec && sec.style.display !== "none") {
+            sec.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        } else {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+          e.preventDefault();
+          searchEl.focus();
+        }
+        if (e.key === "Escape" && document.activeElement === searchEl) {
+          searchEl.value = "";
+          applyFilter();
+        }
+      });
+
+      applyFilter();
+    </script>
+  </body>
+</html>
